@@ -1,0 +1,17 @@
+### 로그인
+POST localhost:8080/auth/login
+Content-Type: application/json
+
+{
+  "userId": "user#1",
+  "accessToken": "accessToken"
+}
+
+### 로그인 실패 (invalid accessToken)
+POST localhost:8080/auth/login
+Content-Type: application/json
+
+{
+  "userId": "user#1",
+  "accessToken": "invalidAccessToken"
+}

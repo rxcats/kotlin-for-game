@@ -15,3 +15,5 @@ include("module-web")
 include("module-aws-auth")
 include("module-aws-dynamodb")
 include("module-aws-s3")
+
+include("sample-app")
