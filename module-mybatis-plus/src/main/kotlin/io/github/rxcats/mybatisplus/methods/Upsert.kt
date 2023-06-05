@@ -31,7 +31,6 @@ class Upsert : AbstractMethod("upsert") {
         val valueSql = getValueSql(tableInfo)
         val afterValueSql = getAfterValueSql(tableInfo)
         val sqlResult = sql.format(tableInfo.tableName, fieldSql, valueSql, afterValueSql)
-        println(sqlResult)
         val sqlSource = languageDriver.createSqlSource(configuration, sqlResult, modelClass)
 
         var keyGenerator: KeyGenerator = NoKeyGenerator.INSTANCE
