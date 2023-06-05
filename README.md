@@ -27,7 +27,7 @@
 ├── module-mybatis-plus : MyBatis Plus kotlin dsl 확장함수
 ├── module-redisson : Redisson Cache, Lock 컴포넌트
 ├── module-web : Filter 등 web 컴포넌트
-└── sample-database : MyBatis Plus 예시 API 프로젝트
+└── sample-app : 예시 API 프로젝트
 ```
 
 ## 구성

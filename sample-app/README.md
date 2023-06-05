@@ -23,7 +23,7 @@ implementation("org.springframework.boot:spring-boot-starter-undertow") {
 
 ### DB 스키마 준비
 
-- 앱 시작시 ApplicationContext 준비 전에 db/schema.sql 을 실행할 수 있도록 init 블럭에서 sql 을 실행하도록 하였습니다.
+- 앱 시작시 db/schema.sql 을 실행할 수 있도록 init 블럭에서 sql 을 실행하도록 하였습니다.
 
 ```kotlin
 @MapperScan
