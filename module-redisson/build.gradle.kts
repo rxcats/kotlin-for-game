@@ -1,10 +1,8 @@
 dependencies {
-    implementation("org.springframework.boot:spring-boot-starter")
-
+    implementation(libs.spring.boot.starter)
+    implementation(libs.redisson)
+    implementation(libs.spring.boot.starter.aop)
+    compileOnly(libs.commons.pool2)
     implementation(project(":core"))
-    implementation("org.redisson:redisson")
-    implementation("org.springframework.boot:spring-boot-starter-aop")
-    compileOnly("org.apache.commons:commons-pool2")
-
-    testImplementation("org.springframework.boot:spring-boot-starter-test")
+    testImplementation(libs.spring.boot.starter.test)
 }

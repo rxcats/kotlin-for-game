@@ -1,5 +1,5 @@
 dependencies {
-    implementation("org.springframework.boot:spring-boot-starter")
-    implementation("software.amazon.awssdk:auth")
-    testImplementation("org.springframework.boot:spring-boot-starter-test")
+    implementation(libs.awssdk.auth)
+    implementation(libs.spring.boot.starter)
+    testImplementation(libs.spring.boot.starter.test)
 }

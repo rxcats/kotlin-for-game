@@ -1,8 +1,8 @@
 dependencies {
-    implementation("org.springframework.boot:spring-boot-starter")
-    api("software.amazon.awssdk:dynamodb")
-    api("software.amazon.awssdk:dynamodb-enhanced")
+    api(libs.awssdk.dynamodb)
+    api(libs.awssdk.dynamodb.enhanced)
+    implementation(libs.spring.boot.starter)
     implementation(project(":core"))
     implementation(project(":module-aws-auth"))
-    testImplementation("org.springframework.boot:spring-boot-starter-test")
+    testImplementation(libs.spring.boot.starter.test)
 }

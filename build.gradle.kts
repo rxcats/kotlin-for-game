@@ -1,10 +1,18 @@
+import io.spring.gradle.dependencymanagement.dsl.ImportsHandler
+import org.gradle.nativeplatform.platform.internal.DefaultNativePlatform
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
+fun ImportsHandler.mavenBom(dep: Provider<MinimalExternalModuleDependency>) = this.mavenBom(dep.get().toString())
+fun PluginAware.apply(dep: Provider<PluginDependency>) = this.apply(plugin = dep.get().pluginId)
+
+val os = DefaultNativePlatform.getCurrentOperatingSystem() ?: error("cannot find os information")
+val arch = DefaultNativePlatform.getCurrentArchitecture() ?: error("cannot find arch information")
+
 plugins {
-    id("org.springframework.boot") version Deps.springBootVersion
-    id("io.spring.dependency-management") version Deps.springDependencyManagementVersion
-    kotlin("jvm") version Deps.kotlinVersion
-    kotlin("plugin.spring") version Deps.kotlinVersion
+    alias(libs.plugins.spring.boot)
+    alias(libs.plugins.spring.dependency.management)
+    alias(libs.plugins.kotlin.jvm)
+    alias(libs.plugins.kotlin.spring)
 }
 
 java.sourceCompatibility = JavaVersion.VERSION_17
@@ -19,29 +27,23 @@ allprojects {
 }
 
 subprojects {
-    apply(plugin = "org.springframework.boot")
-    apply(plugin = "io.spring.dependency-management")
-    apply(plugin = "kotlin")
-    apply(plugin = "kotlin-spring")
+    apply(rootProject.libs.plugins.spring.boot)
+    apply(rootProject.libs.plugins.spring.dependency.management)
+    apply(rootProject.libs.plugins.kotlin.jvm)
+    apply(rootProject.libs.plugins.kotlin.spring)
 
     dependencies {
-        implementation("org.jetbrains.kotlin:kotlin-reflect")
-        implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
-        implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core")
-        implementation("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8")
-        runtimeOnly(group = "io.netty", name = "netty-resolver-dns-native-macos", classifier = "osx-aarch_64")
+        implementation(rootProject.libs.bundles.kotlin)
+        implementation(rootProject.libs.bundles.kotlin.coroutines)
+
+        if (os.isMacOsX && arch.isArm) {
+            runtimeOnly(variantOf(rootProject.libs.netty.dns.macos) { classifier("osx-aarch_64") })
+        }
     }
 
     dependencyManagement {
         imports {
-            mavenBom("software.amazon.awssdk:bom:${Deps.awsJavaSdkV2Version}")
-        }
-
-        dependencies {
-            dependency("com.baomidou:mybatis-plus-boot-starter:${Deps.mybatisPlusVersion}")
-            dependency("com.baomidou:mybatis-plus-extension:${Deps.mybatisPlusVersion}")
-            dependency("com.ninja-squad:springmockk:${Deps.springMockkVersion}")
-            dependency("org.redisson:redisson:${Deps.redissonVersion}")
+            mavenBom(rootProject.libs.aws.bom)
         }
     }
 

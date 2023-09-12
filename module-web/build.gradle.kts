@@ -1,10 +1,8 @@
 dependencies {
-    implementation("org.springframework.boot:spring-boot-starter")
-
-    implementation("org.springframework:spring-web")
-    implementation("jakarta.servlet:jakarta.servlet-api")
+    implementation(libs.spring.boot.starter)
+    implementation(libs.spring.web)
+    implementation(libs.servlet.api)
     implementation(project(":core"))
-
-    testImplementation("org.springframework.boot:spring-boot-starter-test")
-    testImplementation("org.springframework:spring-webmvc")
+    testImplementation(libs.spring.boot.starter.test)
+    testImplementation(libs.spring.webmvc)
 }

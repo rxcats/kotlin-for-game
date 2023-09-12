@@ -1,4 +1,4 @@
 dependencies {
-    implementation("com.baomidou:mybatis-plus-extension")
-    testImplementation("org.springframework.boot:spring-boot-starter-test")
+    implementation(libs.mybatis.plus.extension)
+    testImplementation(libs.spring.boot.starter.test)
 }
