@@ -20,7 +20,7 @@ class TargetDatabaseAdvice(
 
     private val log by loggerK
 
-    @Around("@annotation(io.github.rxcats.datasourceroute.aop.TargetDatabase)")
+    @Around("@annotation(io.github.rxcats.database.aop.TargetDatabase)")
     fun process(pjp: ProceedingJoinPoint): Any? {
         val signature = pjp.signature as MethodSignature
         val annotation = signature.method.getAnnotation(TargetDatabase::class.java)
