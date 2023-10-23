@@ -48,7 +48,7 @@ netty-dns-macos = { module = "io.netty:netty-resolver-dns-native-macos" }
 kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect" }
 kotlin-stdlib-jdk8 = { module = "org.jetbrains.kotlin:kotlin-stdlib-jdk8" }
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core" }
-kotlinx-coroutines-jdk8 = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-jdk8" }
+kotlinx-coroutines-reactor = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-reactor" }
 kotlinx-coroutines-slf4j = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-slf4j" }
 kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test" }
 
@@ -80,5 +80,5 @@ commons-pool2 = { module = "org.apache.commons:commons-pool2" }
 
 [bundles]
 kotlin = ["kotlin-reflect", "kotlin-stdlib-jdk8"]
-kotlin-coroutines = ["kotlinx-coroutines-core", "kotlinx-coroutines-jdk8"]
+kotlin-coroutines = ["kotlinx-coroutines-core", "kotlinx-coroutines-reactor"]
 jackson = ["jackson-module-kotlin", "jackson-datatype-jsr310", "jackson-datatype-jdk8"]
