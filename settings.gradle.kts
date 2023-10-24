@@ -27,3 +27,4 @@ include("module-aws-s3")
 include("module-exposed")
 
 include("sample-app")
+include("sample-arrowkt")

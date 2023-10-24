@@ -19,6 +19,9 @@ redisson = "3.23.4"
 # https://mvnrepository.com/artifact/org.jetbrains.exposed/exposed-spring-boot-starter
 exposed = "0.44.0"
 
+# https://mvnrepository.com/artifact/io.arrow-kt/arrow-core
+arrow-kt = "1.2.1"
+
 [plugins]
 spring-boot = { id = "org.springframework.boot", version.ref = "spring-boot" }
 spring-dependency-management = { id = "io.spring.dependency-management", version.ref = "spring-dependency-management" }
@@ -84,8 +87,12 @@ commons-pool2 = { module = "org.apache.commons:commons-pool2" }
 # exposed
 exposed = { module = "org.jetbrains.exposed:exposed-spring-boot-starter", version.ref = "exposed" }
 
+# arrow-kt
+arrow-core = { module = "io.arrow-kt:arrow-core", version.ref = "arrow-kt" }
+arrow-fx-coroutines = { module = "io.arrow-kt:arrow-fx-coroutines", version.ref = "arrow-kt" }
 
 [bundles]
 kotlin = ["kotlin-reflect", "kotlin-stdlib-jdk8"]
 kotlin-coroutines = ["kotlinx-coroutines-core", "kotlinx-coroutines-reactor"]
 jackson = ["jackson-module-kotlin", "jackson-datatype-jsr310", "jackson-datatype-jdk8"]
+arrow-kt = ["arrow-core", "arrow-fx-coroutines"]
