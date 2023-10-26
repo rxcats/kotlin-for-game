@@ -25,6 +25,7 @@ include("module-aws-auth")
 include("module-aws-dynamodb")
 include("module-aws-s3")
 include("module-exposed")
+include("module-jpa")
 
 include("sample-app")
 include("sample-arrowkt")
