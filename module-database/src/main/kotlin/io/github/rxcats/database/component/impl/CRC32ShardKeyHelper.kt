@@ -8,9 +8,6 @@ import java.util.zip.CRC32
 class CRC32ShardKeyHelper(
     private val properties: RoutingDataSourceProperties
 ) : ShardKeyHelper {
-
-    private val crc = CRC32()
-
     override fun shardNo(dbType: DbType, hashKey: Any): Int {
         if (!dbType.sharded) return 1
 
@@ -18,6 +15,7 @@ class CRC32ShardKeyHelper(
 
         if (shardTargets.size <= 1) return 1
 
+        val crc = CRC32()
         crc.update(hashKey.toString().toByteArray())
         val shard = crc.value % shardTargets.size
         return shardTargets[shard.toInt()]
