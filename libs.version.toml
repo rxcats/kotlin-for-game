@@ -22,6 +22,9 @@ exposed = "0.44.0"
 # https://mvnrepository.com/artifact/io.arrow-kt/arrow-core
 arrow-kt = "1.2.1"
 
+# https://mvnrepository.com/artifact/com.linecorp.kotlin-jdsl/kotlin-jdsl
+jpql-jdsl = "3.0.0"
+
 [plugins]
 spring-boot = { id = "org.springframework.boot", version.ref = "spring-boot" }
 spring-dependency-management = { id = "io.spring.dependency-management", version.ref = "spring-dependency-management" }
@@ -40,6 +43,7 @@ spring-boot-starter-web = { module = "org.springframework.boot:spring-boot-start
 spring-boot-starter-tomcat = { module = "org.springframework.boot:spring-boot-starter-tomcat" }
 spring-boot-starter-undertow = { module = "org.springframework.boot:spring-boot-starter-undertow" }
 spring-boot-starter-validation = { module = "org.springframework.boot:spring-boot-starter-validation" }
+spring-boot-starter-data-jpa = { module = "org.springframework.boot:spring-boot-starter-data-jpa" }
 
 undertow-websockets = { module = "io.undertow:undertow-websockets-jsr" }
 spring-web = { module = "org.springframework:spring-web" }
@@ -91,8 +95,14 @@ exposed = { module = "org.jetbrains.exposed:exposed-spring-boot-starter", versio
 arrow-core = { module = "io.arrow-kt:arrow-core", version.ref = "arrow-kt" }
 arrow-fx-coroutines = { module = "io.arrow-kt:arrow-fx-coroutines", version.ref = "arrow-kt" }
 
+# kotlin-jdsl
+jpql-dsl = { module = "com.linecorp.kotlin-jdsl:jpql-dsl", version.ref = "jpql-jdsl" }
+jpql-render = { module = "com.linecorp.kotlin-jdsl:jpql-render", version.ref = "jpql-jdsl" }
+jpql-spring-data-jpa-support = { module = "com.linecorp.kotlin-jdsl:spring-data-jpa-support", version.ref = "jpql-jdsl" }
+
 [bundles]
 kotlin = ["kotlin-reflect", "kotlin-stdlib-jdk8"]
 kotlin-coroutines = ["kotlinx-coroutines-core", "kotlinx-coroutines-reactor"]
 jackson = ["jackson-module-kotlin", "jackson-datatype-jsr310", "jackson-datatype-jdk8"]
 arrow-kt = ["arrow-core", "arrow-fx-coroutines"]
+jpql-jdsl = ["jpql-dsl", "jpql-render", "jpql-spring-data-jpa-support"]

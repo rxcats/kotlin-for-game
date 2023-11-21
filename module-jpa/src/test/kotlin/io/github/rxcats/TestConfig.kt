@@ -1,34 +1,25 @@
 package io.github.rxcats
 
-import jakarta.persistence.Entity
-import jakarta.persistence.Id
-import jakarta.persistence.Table
+import com.zaxxer.hikari.HikariConfig
+import com.zaxxer.hikari.HikariDataSource
 import org.springframework.context.annotation.ComponentScan
 import org.springframework.context.annotation.Configuration
-import org.springframework.data.jpa.repository.JpaRepository
+import org.springframework.core.io.ClassPathResource
+import org.springframework.jdbc.datasource.init.ScriptUtils
 
-import com.linecorp.kotlinjdsl.support.spring.data.jpa.repository.KotlinJdslJpqlExecutor
 @ComponentScan
 @Configuration(proxyBeanMethods = false)
-class TestConfig
-
-@Entity
-@Table(name = "user")
-class User {
-    @Id
-    var id: Long? = null
-    var name: String? = null
-    var age: Int? = null
-    var email: String? = null
-
-    override fun toString(): String {
-        return "User(id=$id, name=$name, age=$age, email=$email)"
+class TestConfig {
+    init {
+        HikariDataSource(
+            HikariConfig().apply {
+                driverClassName = "com.mysql.cj.jdbc.Driver"
+                jdbcUrl = "jdbc:mysql://localhost:3306"
+                username = "root"
+            }
+        ).connection.use { conn ->
+            val resource = ClassPathResource("schema.sql")
+            ScriptUtils.executeSqlScript(conn, resource)
+        }
     }
-
-}
-
-interface UserRepository: JpaRepository<User, Long>, KotlinJdslJpqlExecutor {
-
-
-
 }
