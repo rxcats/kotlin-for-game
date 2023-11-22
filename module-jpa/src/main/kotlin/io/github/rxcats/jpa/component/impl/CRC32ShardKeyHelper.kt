@@ -18,7 +18,7 @@ class CRC32ShardKeyHelper(
         val crc = CRC32()
         crc.update(hashKey.toString().toByteArray())
         val shard = crc.value % shardTargets.size
-
+        crc.reset()
         return shardTargets[shard.toInt()]
     }
 }

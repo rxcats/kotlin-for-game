@@ -6,18 +6,21 @@ import io.github.rxcats.core.loggerK
 import io.github.rxcats.jpa.component.ShardKeyHelper
 import io.github.rxcats.jpa.component.impl.CRC32ShardKeyHelper
 import jakarta.persistence.EntityManagerFactory
+import org.hibernate.cfg.AvailableSettings
 import org.springframework.beans.factory.annotation.Qualifier
+import org.springframework.beans.factory.config.ConfigurableListableBeanFactory
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.context.properties.EnableConfigurationProperties
+import org.springframework.boot.orm.jpa.EntityManagerFactoryBuilder
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.DependsOn
 import org.springframework.context.annotation.Primary
 import org.springframework.jdbc.datasource.LazyConnectionDataSourceProxy
+import org.springframework.orm.hibernate5.SpringBeanContainer
 import org.springframework.orm.jpa.JpaTransactionManager
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean
-import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter
 import org.springframework.transaction.PlatformTransactionManager
 import javax.sql.DataSource
 
@@ -72,12 +75,18 @@ class RoutingDataSourceConfig {
 
     @Primary
     @Bean("entityManagerFactory")
-    fun entityManagerFactory(@Qualifier("dataSource") dataSource: DataSource): LocalContainerEntityManagerFactoryBean {
-        val bean = LocalContainerEntityManagerFactoryBean()
-        bean.dataSource = dataSource
-        bean.setPackagesToScan("io.github.rxcats")
-        bean.jpaVendorAdapter = HibernateJpaVendorAdapter()
-        return bean
+    fun entityManagerFactory(
+        @Qualifier("dataSource") dataSource: DataSource,
+        builder: EntityManagerFactoryBuilder,
+        beanFactory: ConfigurableListableBeanFactory
+    ): LocalContainerEntityManagerFactoryBean {
+        return builder
+            .dataSource(dataSource)
+            .packages("io.github.rxcats")
+            .properties(emptyMap<String, String>())
+            .build().apply {
+                this.jpaPropertyMap[AvailableSettings.BEAN_CONTAINER] = SpringBeanContainer(beanFactory)
+            }
     }
 
     @Primary
