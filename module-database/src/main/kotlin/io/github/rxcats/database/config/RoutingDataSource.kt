@@ -13,17 +13,6 @@ class RoutingDataSource : AbstractRoutingDataSource() {
         return RoutingDataSourceContextHolder.get()
     }
 
-    fun close() {
-        for ((dbname, ds) in this.resolvedDataSources) {
-            try {
-                log.info("RoutingDataSource {} close", dbname)
-                ds.connection.close()
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
-        }
-    }
-
     fun resolvedDataSourcesConnectionStatusLogging() {
         for ((dbname, ds) in this.resolvedDataSources) {
             val mx = (ds as HikariDataSource).hikariPoolMXBean

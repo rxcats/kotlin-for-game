@@ -1,6 +1,5 @@
 package io.github.rxcats.database.config
 
-import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import io.github.rxcats.core.loggerK
 import io.github.rxcats.database.component.ShardKeyHelper
@@ -24,7 +23,7 @@ import javax.sql.DataSource
 class RoutingDataSourceConfig {
     private val log by loggerK
 
-    @Bean("routingDataSource", destroyMethod = "close")
+    @Bean("routingDataSource")
     fun routingDataSource(properties: RoutingDataSourceProperties): RoutingDataSource {
         val dataSourceMap = linkedMapOf<Any, Any>()
 
@@ -39,7 +38,7 @@ class RoutingDataSourceConfig {
         }
 
         for ((dbname, hikari) in properties.hikari) {
-            val config = HikariConfig().apply {
+            dataSourceMap[dbname] = HikariDataSource().apply {
                 driverClassName = properties.driverClassName
                 jdbcUrl = hikari.jdbcUrl
                 username = hikari.username
@@ -50,8 +49,6 @@ class RoutingDataSourceConfig {
                 isReadOnly = hikari.replica
                 isRegisterMbeans = true
             }
-
-            dataSourceMap[dbname] = HikariDataSource(config)
         }
 
         val router = RoutingDataSource()
