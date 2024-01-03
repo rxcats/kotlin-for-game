@@ -1,10 +1,5 @@
 package io.github.rxcats
 
-import com.baomidou.mybatisplus.annotation.FieldFill
-import com.baomidou.mybatisplus.annotation.IdType
-import com.baomidou.mybatisplus.annotation.TableField
-import com.baomidou.mybatisplus.annotation.TableId
-import com.baomidou.mybatisplus.annotation.TableName
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -13,16 +8,15 @@ import com.fasterxml.jackson.datatype.jdk8.Jdk8Module
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.KotlinFeature
 import com.fasterxml.jackson.module.kotlin.KotlinModule
+import com.mybatisflex.annotation.Id
+import com.mybatisflex.annotation.Table
+import com.mybatisflex.core.BaseMapper
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import io.github.rxcats.core.loggerK
-import io.github.rxcats.database.aop.ShardHashKey
-import io.github.rxcats.database.aop.TargetDatabase
-import io.github.rxcats.database.type.DbType
-import io.github.rxcats.mybatisplus.mapper.CrudMapper
+import io.github.rxcats.database.component.RoutingQuery
 import jakarta.validation.ConstraintViolationException
 import jakarta.validation.constraints.NotBlank
-import org.apache.ibatis.annotations.Mapper
 import org.apache.ibatis.io.Resources
 import org.apache.ibatis.jdbc.ScriptRunner
 import org.mybatis.spring.annotation.MapperScan
@@ -125,7 +119,7 @@ class AuthController(
         if (user == null) {
             user = service.createUser(param.userId)
         } else {
-            service.updateLoginUser(param.userId, user)
+            service.updateLoginUser(user)
         }
 
         return ApiResponse(data = user)
@@ -137,22 +131,19 @@ class AuthController(
     }
 }
 
-@TableName("user")
+@Table("user")
 data class User(
-    @TableId(type = IdType.INPUT)
+    @Id
     var userId: String? = null,
 
     var nickname: String = "",
 
-    @TableField(fill = FieldFill.INSERT)
     var createdAt: LocalDateTime? = null,
 
-    @TableField(fill = FieldFill.INSERT_UPDATE)
     var updatedAt: LocalDateTime? = null
 )
 
-@Mapper
-interface UserMapper : CrudMapper<User>
+interface UserMapper : BaseMapper<User>
 
 @Service
 class AuthService(
@@ -164,24 +155,21 @@ class AuthService(
         }
     }
 
-    @TargetDatabase(db = DbType.USER)
-    fun getUser(@ShardHashKey userId: String): User? {
-        return mapper.selectById(userId)
+    fun getUser(userId: String): User? = RoutingQuery("user1") {
+        mapper.selectOneById(userId)
     }
 
-    @TargetDatabase(db = DbType.USER)
-    fun updateLoginUser(@ShardHashKey userId: String, user: User): User {
-        mapper.updateById(user)
-        return user
+    fun updateLoginUser(user: User): User = RoutingQuery("user1") {
+        mapper.update(user)
+        user
     }
 
-    @TargetDatabase(db = DbType.USER)
-    fun createUser(@ShardHashKey userId: String): User {
-        val user = User(userId = userId, nickname = "GUEST")
+    fun createUser(userId: String): User = RoutingQuery("user1") {
+        val now = LocalDateTime.now()
+        val user = User(userId = userId, nickname = "GUEST", createdAt = now, updatedAt = now)
         mapper.insert(user)
-        return user
+        user
     }
-
 }
 
 @RestControllerAdvice

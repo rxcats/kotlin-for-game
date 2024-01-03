@@ -2,7 +2,6 @@ package io.github.rxcats.redisson.cache
 
 import com.fasterxml.jackson.module.kotlin.readValue
 import io.github.rxcats.core.Json
-import io.github.rxcats.redisson.entity.CacheResult
 import java.util.concurrent.TimeUnit
 import kotlin.time.Duration
 import org.redisson.api.RedissonClient
@@ -13,10 +12,10 @@ class RedissonCacheClient(
     val redisson: RedissonClient
 ) {
 
-    final inline fun <reified T : Any> get(key: String): CacheResult<T> {
+    final inline fun <reified T : Any> get(key: String): T? {
         val bucket = redisson.getBucket<String>(key)
-        val data = bucket.get() ?: return CacheResult.of()
-        return CacheResult.of(Json.readValue<T>(data))
+        val data = bucket.get() ?: return null
+        return Json.readValue<T>(data)
     }
 
     final fun set(key: String, value: Any, ttl: Duration = Duration.ZERO) {
@@ -34,16 +33,16 @@ class RedissonCacheClient(
         bucket.delete()
     }
 
-    final inline fun <reified T : Any> withCache(key: String, ttl: Duration, action: () -> T?): CacheResult<T> {
+    final inline fun <reified T : Any> withCache(key: String, ttl: Duration, action: () -> T?): T? {
         var result = get<T>(key)
 
-        if (result.isNull) {
-            result = CacheResult.of(action())
+        if (result == null) {
+            result = action()
         }
 
-        if (result.isNull) return result
+        if (result == null) return result
 
-        set(key, result.getOrThrow(), ttl)
+        set(key, result, ttl)
 
         return result
     }

@@ -2,15 +2,11 @@ package io.github.rxcats
 
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
-import io.github.rxcats.database.aop.TargetDatabaseAdvice
-import io.github.rxcats.database.component.ShardKeyHelper
 import org.apache.ibatis.io.Resources.getResourceAsReader
 import org.apache.ibatis.jdbc.ScriptRunner
 import org.mybatis.spring.annotation.MapperScan
-import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.ComponentScan
 import org.springframework.context.annotation.Configuration
-import org.springframework.transaction.PlatformTransactionManager
 
 @MapperScan
 @ComponentScan
@@ -29,13 +25,5 @@ class TestConfig {
             runner.setStopOnError(true)
             runner.runScript(getResourceAsReader("schema.sql"))
         }
-    }
-
-    @Bean
-    fun targetDatabaseAdvice(
-        platformTransactionManager: PlatformTransactionManager,
-        shardKeyHelper: ShardKeyHelper
-    ): TargetDatabaseAdvice {
-        return TargetDatabaseAdvice(platformTransactionManager, shardKeyHelper)
     }
 }

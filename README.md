@@ -3,7 +3,7 @@
 ## 소개
 
 - Spring Boot 와 Kotlin 을 이용하여 빠르게 서버 컨텐츠를 만들기 위해 사용하던 기능들을 모아보았습니다.
-- MyBatis 를 확장하여 구현한 MyBatis Plus 를 이용 Query 없이 Entity 를 이용하여 DB 기능을 수행할 수 있습니다.
+- MyBatis 를 확장하여 구현한 MyBatis Flex 를 이용 Query 없이 Entity 를 이용하여 DB 기능을 수행할 수 있습니다.
 - RoutingDataSource 를 이용하여 DB 샤딩 기능을 사용할 수 있습니다.
 - AWS SDK 기능 사용시 AWS 키 인증과 IAM 인증 방식을 선택하여 사용할 수 있습니다.
 - AWS DynamoDB 기능을 DynamoOperations 를 확장하여 Repository 를 만들어 기본기능을 이용할 수 있습니다.
@@ -23,8 +23,8 @@
 ├── core : 공통 라이브러리
 ├── module-aws-auth : AWS 인증 설정
 ├── module-aws-dynamodb : AWS DynamoDB 컴포넌트
-├── module-database : MyBatis Plus 및 RoutingDataSource 컴포넌트
-├── module-mybatis-plus : MyBatis Plus kotlin dsl 확장함수
+├── module-database : MyBatis Flex 컴포넌트
+├── module-mybatis-flex : MyBatis Flex 디펜던시 및 설정
 ├── module-redisson : Redisson Cache, Lock 컴포넌트
 ├── module-web : Filter 등 web 컴포넌트
 └── sample-app : 예시 API 프로젝트
@@ -32,47 +32,27 @@
 
 ## 구성
 
-### MyBatis Plus
+### MyBatis Flex
 
 - MyBatis 를 SQL 을 직접 작성하지 않고 Entity 로 사용할 수 있도록 Wrapping 한 라이브러리
-- https://github.com/baomidou/mybatis-plus
+- https://github.com/mybatis-flex/mybatis-flex
 
 #### application.properties db 설정
 
 ```
-# mybatis plus configuration
-mybatis-plus.configuration.map-underscore-to-camel-case=true
-mybatis-plus.global-config.banner=false
+# mybatis flex configuration
+mybatis-flex.configuration.map-underscore-to-camel-case=true
+mybatis-flex.global-config.print-banner=false
 
-app.db.driver-class-name=com.mysql.cj.jdbc.Driver
+# user[1] : 샤드 1번
+mybatis-flex.datasource.user1.url=jdbc:mysql://localhost:3306/sample_app_user01?serverTimezone=UTC
+mybatis-flex.datasource.user1.username=root
+mybatis-flex.datasource.user1.password=
 
-# commondb 는 샤드를 사용하지 않고 1개의 db 만 사용합니다.
-app.db.info.commondb.shard-targets=1
-
-# userdb 는 샤드 2개를 사용합니다.
-app.db.info.userdb.shard-targets=1,2
-
-# commondb : 공통으로 사용하는 db 이고, 샤딩을 하지 않습니다.
-app.db.hikari.commondb.jdbc-url=jdbc:mysql://localhost:3306/route_commondb?serverTimezone=UTC
-app.db.hikari.commondb.username=
-app.db.hikari.commondb.password=
-app.db.hikari.commondb.max-pool-size=1
-app.db.hikari.commondb.connection-timeout=5s
-
-# userdb : 유저 데이터를 샤딩하여 사용하는 db 입니다. 여기에서는 2개로 샤딩을 설정하였습니다.
-# userdb[1] : 샤드 1번
-app.db.hikari.userdb1.jdbc-url=jdbc:mysql://localhost:3306/route_userdb1?serverTimezone=UTC
-app.db.hikari.userdb1.username=
-app.db.hikari.userdb1.password=
-app.db.hikari.userdb1.max-pool-size=1
-app.db.hikari.userdb1.connection-timeout=5s
-
-# userdb[2] : 샤드 2번
-app.db.hikari.userdb2.jdbc-url=jdbc:mysql://localhost:3306/route_userdb2?serverTimezone=UTC
-app.db.hikari.userdb2.username=
-app.db.hikari.userdb2.password=
-app.db.hikari.userdb2.max-pool-size=1
-app.db.hikari.userdb2.connection-timeout=5s
+# user[2] : 샤드 2번
+mybatis-flex.datasource.user2.url=jdbc:mysql://localhost:3306/sample_app_user02?serverTimezone=UTC
+mybatis-flex.datasource.user2.username=root
+mybatis-flex.datasource.user2.password=
 
 ```
 
@@ -81,28 +61,10 @@ app.db.hikari.userdb2.connection-timeout=5s
 ```kotlin
 @Service
 class UserService(
-    private val commonUserMapper: CommonUserMapper
+    private val userMapper: UserMapper
 ) {
-    fun getCommonUser(userId: String): CommonUser? = RoutingQuery(db = DbType.COMMON) {
-        commonUserMapper.selectById(userId)
-    }
-}
-```
-
-#### AOP
-
-```kotlin
-@Service
-class UserService(
-    private val commonUserMapper: CommonUserMapper
-) {
-
-    @TargetDatabase(db = DbType.COMMON.get())
-    fun getCommonUser(userId: String): CommonUser? = commonUserMapper.selectById(userId)
-
-    @TargetDatabase(db = DbType.COMMON.get(), useTransaction = true)
-    fun insertUserWithTransaction(user: CommonUser) {
-        commonUserMapper.insert(user)
+    fun getUser(userId: String): User? = RoutingQuery(db = "user1") {
+        userMapper.selectOneById(userId)
     }
 }
 ```
@@ -115,12 +77,16 @@ class UserService(
 @Service
 class UserService(
     private val cacheClient: RedissonCacheClient,
-    private val commonUserMapper: CommonUserMapper
+    private val userMapper: UserMapper
 ) {
 
-    fun getCommonUser(userId: String): CommonUser? = cacheClient.withCache("commonUser:$userId", 5.minutes) {
-        commonUserMapper.selectById(userId)
-    }.getOrNull()
+    fun getUser(userId: String): User? = RoutingQuery(db = "user1") {
+        userMapper.selectOneById(userId)
+    }
+
+    fun getUserViaCache(userId: String): User? = cacheClient.withCache("user:$userId", 5.minutes) {
+        getUser(userId)
+    }
 
 }
 ```

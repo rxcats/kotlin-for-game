@@ -16,7 +16,7 @@ dependencyResolutionManagement {
 rootProject.name = "kotlin-for-game"
 
 include("core")
-include("module-mybatis-plus")
+include("module-mybatis-flex")
 include("module-database")
 include("module-redisson")
 include("module-web")

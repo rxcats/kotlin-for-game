@@ -8,6 +8,7 @@ fun PluginAware.apply(dep: Provider<PluginDependency>) = this.apply(plugin = dep
 
 val os = DefaultNativePlatform.getCurrentOperatingSystem() ?: error("cannot find os information")
 val arch = DefaultNativePlatform.getCurrentArchitecture() ?: error("cannot find arch information")
+val javaVersion = JavaVersion.VERSION_21
 
 plugins {
     alias(libs.plugins.spring.boot)
@@ -16,7 +17,10 @@ plugins {
     alias(libs.plugins.kotlin.spring)
 }
 
-java.sourceCompatibility = JavaVersion.VERSION_17
+java {
+    sourceCompatibility = javaVersion
+    targetCompatibility = javaVersion
+}
 
 allprojects {
     group = "io.github.rxcats"
@@ -24,6 +28,8 @@ allprojects {
 
     repositories {
         mavenCentral()
+        maven { url = uri("https://repo.spring.io/milestone") }
+        maven { url = uri("https://repo.spring.io/snapshot") }
     }
 }
 
@@ -32,6 +38,11 @@ subprojects {
     apply(rootProject.libs.plugins.spring.dependency.management)
     apply(rootProject.libs.plugins.kotlin.jvm)
     apply(rootProject.libs.plugins.kotlin.spring)
+
+    java {
+        sourceCompatibility = javaVersion
+        targetCompatibility = javaVersion
+    }
 
     dependencies {
         implementation(rootProject.libs.bundles.kotlin)
@@ -51,7 +62,7 @@ subprojects {
     tasks.withType<KotlinCompile> {
         kotlinOptions {
             freeCompilerArgs = listOf("-Xjsr305=strict")
-            jvmTarget = "17"
+            jvmTarget = javaVersion.toString()
         }
     }
 
@@ -71,7 +82,7 @@ tasks.register("createModule") {
         val moduleName = providers.systemProperty("moduleName").orNull
 
         if (moduleName.isNullOrBlank()) {
-            error("require moduleName property `-DmoduleName={moduleName}`")
+            error("require moduleName property `./gradlew ${this.name} -DmoduleName={moduleName}`")
         }
 
         // main

@@ -32,17 +32,15 @@ class RedissonCacheClientTest(
 
         val after = cacheClient.get<SomeObject>(key)
         log.info("{}", after)
-        assertThat(after.isNull).isFalse()
+        assertThat(after).isNotNull()
 
-        val value = after.getOrThrow()
-
-        assertThat(value.attr1).isNull()
-        assertThat(value.date).isNull()
+        assertThat(after?.attr1).isNull()
+        assertThat(after?.date).isNull()
 
         cacheClient.delete(key)
 
         val deleted = cacheClient.get<SomeObject>(key)
-        assertThat(deleted.isNull).isTrue()
+        assertThat(deleted).isNull()
     }
 
     @Test
@@ -54,12 +52,12 @@ class RedissonCacheClientTest(
         }
 
         log.info("{}", after)
-        assertThat(after.isNull).isFalse()
+        assertThat(after).isNotNull()
 
         cacheClient.delete(key)
 
         val deleted = cacheClient.get<SomeObject>(key)
-        assertThat(deleted.isNull).isTrue()
+        assertThat(deleted).isNull()
     }
 
     @Test
