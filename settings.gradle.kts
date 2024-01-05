@@ -29,3 +29,7 @@ include("module-jpa")
 
 include("sample-app")
 include("sample-arrowkt")
+
+include("perf-test:undertow")
+include("perf-test:webflux")
+include("perf-test:module-redis")
