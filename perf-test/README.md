@@ -2,9 +2,11 @@
 
 ## 소개
 
-- Redis 를 활용한 WebFlux 와 Undertow 의 기본 성능 테스트
+- Redis 를 활용한 Spring WebFlux 와 Undertow 의 기본 성능 테스트
+- 추가로 Quarkus 및 Vert.x 를 테스트
 
 ## 구성
+
 - JDK21, SpringBoot 3.2.1
 - M1 MacBook Pro 14 32G
 - JVM HeapSize 128M, ActiveProcessorCount 를 2개로 제약
@@ -57,3 +59,35 @@ Transfer/sec:      4.03MB
 ```
 
 ![webflux_visualvm](./webflux_visualvm.png)
+
+### Quarkus
+
+```shell
+Running 5m test @ http://localhost:19003/quarkus
+  6 threads and 500 connections
+  Thread Stats   Avg      Stdev     Max   +/- Stdev
+    Latency     8.89ms    2.94ms 137.82ms   88.17%
+    Req/Sec     9.41k   727.58    12.86k    92.35%
+  16851429 requests in 5.00m, 1.91GB read
+  Socket errors: connect 0, read 843, write 4, timeout 0
+Requests/sec:  56154.07
+Transfer/sec:      6.53MB
+```
+
+![quarkus_visualvm](./quarkus_visualvm.png)
+
+### Ktor
+
+```shell
+Running 5m test @ http://localhost:19005/ktor
+  6 threads and 500 connections
+  Thread Stats   Avg      Stdev     Max   +/- Stdev
+    Latency     9.55ms    3.61ms 165.12ms   85.65%
+    Req/Sec     8.79k     0.86k   10.64k    89.89%
+  15747581 requests in 5.00m, 1.54GB read
+  Socket errors: connect 0, read 369, write 0, timeout 0
+Requests/sec:  52475.63
+Transfer/sec:      5.25MB
+```
+
+![ktor_visualvm](./ktor_visualvm.png)
